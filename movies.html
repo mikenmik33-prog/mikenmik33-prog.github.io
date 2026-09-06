@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Must-Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="must-watch.css">
+</head>
+<body>
+
+<div class="magazine-shell">
+    <div id="reading-progress" class="reading-progress"></div>
+    <div id="ctrlPanel" class="ctrl-panel">
+        <a href="../system/index.html" class="brand-icon-back" title="Назад">←</a>
+        <button id="towatchToggle" class="brand-icon-towatch" type="button" title="Хочу подивитись">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        </button>
+        <button id="sortToggle" class="brand-icon-sort" type="button" title="За рейтингом (найкращі зверху)">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </button>
+        <div class="ctrl-sep"></div>
+        <button id="searchToggle" class="ctrl-search-toggle" type="button" title="Пошук">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+        <input id="searchInput" class="ctrl-search-input" type="text" placeholder="Пошук..." autocomplete="off">
+    </div>
+    <div id="searchResults" class="ctrl-search-drop"></div>
+    <div class="top-bar">
+        <div id="page-indicator" class="page-indicator">
+            <span id="page-current">1</span><span class="page-sep">/</span><span id="page-total">1</span>
+        </div>
+        <div id="translate-global" class="lang-switch">
+            <button class="lang-option" data-lang="ua" type="button">UA</button>
+            <button class="lang-option" data-lang="en" type="button">EN</button>
+        </div>
+    </div>
+    <div id="alpha-nav" class="alpha-nav"></div>
+    <div id="alpha-flyout" class="alpha-flyout"></div>
+    <div id="magazine" class="closed">
+        <div id="pages" class="pages">
+
+            <div class="leaf leaf-cover">
+                <div class="cover-face">
+                    <div class="cover-top">
+                        <span class="cover-divider-line"></span>
+                        <span class="cover-title-small"
+                            data-ua="Особистий журнал переглядів"
+                            data-en="Personal Viewing Journal"></span>
+                        <span class="cover-divider-line"></span>
+                    </div>
+                    <header class="cover-header">
+                        <h1 class="cover-logo">MUST-WATCH</h1>
+                    </header>
+                    <section class="stats-panel">
+                        <div class="stat cat-movie">
+                            <span class="number">121</span>
+                            <span class="label"
+                                data-ua="Фільми"
+                                data-en="Films"></span>
+                        </div>
+                        <div class="stat cat-series">
+                            <span class="number">27</span>
+                            <span class="label"
+                                data-ua="Серіали"
+                                data-en="Series"></span>
+                        </div>
+                        <div class="stat cat-cartoon">
+                            <span class="number">21</span>
+                            <span class="label"
+                                data-ua="Мультфільми"
+                                data-en="Cartoons"></span>
+                        </div>
+                        <div class="stat cat-anime">
+                            <span class="number">5</span>
+                            <span class="label"
+                                data-ua="Аніме"
+                                data-en="Anime"></span>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <div class="leaf leaf-contents">
+                <div class="contents-face">
+                    <h2 class="contents-title"
+                        data-ua="Зміст"
+                        data-en="Contents"></h2>
+                    <div id="contents-grid" class="contents-grid"></div>
+                </div>
+            </div>
+
+            <div class="leaf leaf-back">
+                <div class="back-face">
+                    <div class="back-monogram">MW</div>
+                    <p class="back-tagline"><span class="brand">Must-Watch</span> • <span
+                            data-ua="Особистий журнал переглядів"
+                            data-en="Personal Viewing Journal"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="side-menu" class="side-menu">
+        <button id="menu-home" class="side-menu-btn" type="button">
+            <span class="side-menu-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5l9-7 9 7"/><path d="M5 9.5V21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-5h2v5a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V9.5"/></svg></span>
+            <span class="side-menu-label"
+                data-ua="Головна"
+                data-en="Home"></span>
+        </button>
+        <button id="menu-contents" class="side-menu-btn" type="button">
+            <span class="side-menu-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="15.5 8.5 13.2 13.2 8.5 15.5 10.8 10.8 15.5 8.5"/></svg></span>
+            <span class="side-menu-label"
+                data-ua="Навігація"
+                data-en="Navigation"></span>
+        </button>
+        <div class="side-menu-divider"></div>
+        <button class="side-menu-btn side-menu-cat cat-movie" type="button" data-category="movie">
+            <span class="side-menu-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="16" rx="1.5"/><line x1="7" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="17" y2="20"/><line x1="2.5" y1="9" x2="7" y2="9"/><line x1="2.5" y1="15" x2="7" y2="15"/><line x1="17" y1="9" x2="21.5" y2="9"/><line x1="17" y1="15" x2="21.5" y2="15"/></svg></span>
+            <span class="side-menu-label"
+                data-ua="Фільми"
+                data-en="Films"></span>
+        </button>
+        <button class="side-menu-btn side-menu-cat cat-series" type="button" data-category="series">
+            <span class="side-menu-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6.5" width="19" height="13" rx="1.5"/><polyline points="8 3 12 6.5 16 3"/></svg></span>
+            <span class="side-menu-label"
+                data-ua="Серіали"
+                data-en="Series"></span>
+        </button>
+        <button class="side-menu-btn side-menu-cat cat-cartoon" type="button" data-category="cartoon">
+            <span class="side-menu-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.3-.5-.8-.5-1.2 0-1.1.9-2 2-2h2.3c1.8 0 3.2-1.4 3.2-3.2C20.5 6.6 16.7 2 12 2z"/><circle cx="7.5" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="9" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="14" cy="7.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="16.5" cy="11" r="1.1" fill="currentColor" stroke="none"/></svg></span>
+            <span class="side-menu-label"
+                data-ua="Мультфільми"
+                data-en="Cartoons"></span>
+        </button>
+        <button class="side-menu-btn side-menu-cat cat-anime" type="button" data-category="anime">
+            <span class="side-menu-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="7.5" y1="10" x2="7.5" y2="21"/><line x1="16.5" y1="10" x2="16.5" y2="21"/></svg></span>
+            <span class="side-menu-label"
+                data-ua="Аніме"
+                data-en="Anime"></span>
+        </button>
+    </div>
+    <div id="towatchModal" class="towatch-modal">
+        <div class="towatch-modal-backdrop"></div>
+        <div class="towatch-modal-panel">
+            <div class="towatch-modal-header">
+                <h2 data-ua="Хочу подивитись" data-en="Want to Watch"></h2>
+                <button id="towatchClose" class="towatch-modal-close" type="button">✕</button>
+            </div>
+            <div id="towatchList" class="towatch-list"></div>
+        </div>
+    </div>
+    <div id="ratingModal" class="towatch-modal">
+        <div class="towatch-modal-backdrop"></div>
+        <div class="towatch-modal-panel">
+            <div class="towatch-modal-header">
+                <h2 data-ua="За рейтингом" data-en="By Rating"></h2>
+                <button id="ratingClose" class="towatch-modal-close" type="button">✕</button>
+            </div>
+            <div id="ratingList" class="towatch-list"></div>
+        </div>
+    </div>
+</div>
+
+<script src="must-watch-data.js"></script>
+<script src="must-watch-be-like.js"></script>
+<script src="must-watch.js"></script>
+</body>
+</html>
