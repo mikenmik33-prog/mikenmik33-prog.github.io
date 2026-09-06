@@ -9,7 +9,7 @@
     setupClickWaterRipples();
 })();
 
-const croakAudio = new Audio("frog.mp3");
+const croakAudio = new Audio("audio/frog.mp3");
 croakAudio.preload = "auto";
 croakAudio.volume = 0.6;
 croakAudio.load();
