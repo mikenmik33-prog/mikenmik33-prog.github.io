@@ -733,6 +733,7 @@ function loadLeafImages(leaf) {
         const wanted = getLangSrc(img);
         if (wanted && img.getAttribute("src") !== wanted) {
             img.src = wanted;
+            img.parentElement?.style.setProperty("--poster-bg", `url("${wanted}")`);
         }
         img.classList.add("is-loaded");
     });
