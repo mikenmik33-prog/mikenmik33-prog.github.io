@@ -1811,20 +1811,6 @@ html::-webkit-scrollbar-thumb:hover {
         min-width: 480px;
     }
 
-    .table-scroll {
-        position: relative;
-    }
-
-    .table-scroll::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        width: 22px;
-        background: linear-gradient(90deg, transparent, rgba(15, 17, 22, .9));
-        pointer-events: none;
-    }
 }
 
 @media (max-width: 520px) {
