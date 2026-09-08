@@ -632,10 +632,6 @@ let universityCurrentEntry = loadUniversityCurrentEntry(universityEntries.length
             const nextIdx = universityCurrentEntry + 1;
             const nextEntry = universityEntries[nextIdx];
             if (!nextEntry) break;
-            // Only reflow content that is itself an auto-created overflow continuation of
-            // THIS entry (created by moveOverflowToNextEntry). A genuinely separate entry
-            // (a different diary page the user wrote/added) must never be pulled backward
-            // and merged into whatever is currently being edited.
             if (!nextEntry.autoContinuation) break;
 
             const temp = document.createElement("div");
@@ -681,11 +677,6 @@ let universityCurrentEntry = loadUniversityCurrentEntry(universityEntries.length
     }
 
     function normalizeTrailingDoubleBr(el) {
-        // Collapse AT MOST ONE redundant trailing bare <br> (the extra line-break some
-        // browsers leave behind purely to keep a final empty line rendering/host a caret).
-        // This must never loop: looping here would silently eat through every real blank
-        // line the user typed, collapsing several of them in one shot and making the caret
-        // appear to "jump" up multiple lines instead of moving up exactly one at a time.
         if (el.childNodes.length < 2) return;
         const last = el.lastChild;
         const prev = last.previousSibling;
@@ -719,13 +710,6 @@ let universityCurrentEntry = loadUniversityCurrentEntry(universityEntries.length
 
         stripPadding(textEl);
         stripPadding(rightText);
-        // NOTE: normalizeTrailingDoubleBr() used to run here on every deletion. It collapsed
-        // trailing bare <br> lines beyond what the browser's own native Backspace already
-        // removed, so whenever the debounced sync settled while 2+ blank lines sat at the end
-        // of the page, it silently deleted an EXTRA line on top of the one the user actually
-        // deleted - the caret then visibly jumped up multiple lines instead of exactly one.
-        // Native Backspace already merges/removes lines correctly on its own; this extra pass
-        // is not needed and is intentionally left disabled.
 
         const editedRight = e && e.target === rightText;
 
@@ -891,13 +875,6 @@ let universityCurrentEntry = loadUniversityCurrentEntry(universityEntries.length
     textEl.addEventListener("keydown", handleBoundaryKeydown);
     rightText.addEventListener("keydown", handleBoundaryKeydown);
 
-    // ArrowRight/ArrowDown at the very end of the left page, and ArrowLeft/ArrowUp at the very
-    // start of the right page, should hop to the adjacent page - mirroring how Backspace/Delete
-    // already cross the page boundary above. We deliberately do NOT decide this from plain-text
-    // length (that would skip over blank lines still sitting on the current page). Instead we
-    // let the native key handling run first, then check on the next tick whether the caret
-    // actually moved. If it's still in the exact same spot, the browser had nowhere left to go
-    // on this page, so we move it onto the other one.
     function caretVisualPosition() {
         const sel = window.getSelection();
         if (!sel || !sel.rangeCount) return null;
@@ -905,9 +882,6 @@ let universityCurrentEntry = loadUniversityCurrentEntry(universityEntries.length
         if (!range.collapsed) return null;
         let rect = range.getBoundingClientRect();
         if (rect.width === 0 && rect.height === 0 && rect.top === 0 && rect.left === 0) {
-            // A collapsed range right at certain positions (e.g. a text node end that sits
-            // against an element boundary) reports an all-zero rect instead of the caret's real
-            // on-screen spot. Insert a temporary zero-width marker to get a trustworthy rect.
             const marker = document.createElement("span");
             marker.textContent = "​";
             const markerRange = range.cloneRange();
@@ -935,10 +909,6 @@ let universityCurrentEntry = loadUniversityCurrentEntry(universityEntries.length
         window.setTimeout(() => {
             if (document.activeElement !== el) return;
             const after = caretVisualPosition();
-            // Trailing <br> padding can leave the DOM container/offset identical to before a
-            // horizontal move even though the browser did move the caret onto a new line, so we
-            // compare the caret's on-screen position (not raw container/offset) to decide
-            // whether native handling actually had anywhere left to go on this page.
             const stillAtSameSpot =
                 after &&
                 Math.abs(after.top - before.top) < 1 &&
