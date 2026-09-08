@@ -11,10 +11,10 @@
 // Якщо apiKey нижче лишити без змін ("YOUR_API_KEY"), синхронізація просто
 // не увімкнеться і сайт працюватиме як раніше — тільки локально, на цьому пристрої.
 window.FIREBASE_CONFIG = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyBMxYxC9APd5eWfU8b-q5DDCE_9bPxVV8E",
+    authDomain: "info-eab91.firebaseapp.com",
+    projectId: "info-eab91",
+    storageBucket: "info-eab91.firebasestorage.app",
+    messagingSenderId: "393273032281",
+    appId: "1:393273032281:web:dc814891e66d404b13fb48"
 };
