@@ -1746,6 +1746,18 @@ html::-webkit-scrollbar-thumb:hover {
 }
 
 @media (max-width: 700px) {
+    /* Keep all form controls at >=16px so mobile browsers don't auto-zoom on focus. */
+    input,
+    select,
+    textarea,
+    .buy-row input,
+    .buy-row-case-select,
+    .sell-field input,
+    .sell-field select,
+    .price-row input {
+        font-size: 16px;
+    }
+
     .buy-row,
     .buy-row:has(.buy-row-remove[data-hidden="1"]) {
         grid-template-columns: 1fr;
