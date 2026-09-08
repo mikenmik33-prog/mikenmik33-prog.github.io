@@ -2,6 +2,10 @@
     box-sizing: border-box;
 }
 
+button, a, [role="button"] {
+    touch-action: manipulation;
+}
+
 :root {
     --magazine-w: min(88vw, 900px);
     --magazine-h: min(88vh, 700px);
@@ -1406,6 +1410,11 @@ body:has(.towatch-modal.open) .alpha-nav {
    can no longer live side by side — stack it into one column:
    poster on top, description below with its own scroll. ---------- */
 @media (max-width: 600px) {
+    /* Keep the search field at >=16px so mobile browsers don't auto-zoom on focus. */
+    .ctrl-panel.search-open .ctrl-search-input {
+        font-size: 16px;
+    }
+
     .leaf-spread {
         flex-direction: column;
     }
