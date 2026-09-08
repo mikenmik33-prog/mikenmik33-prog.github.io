@@ -992,6 +992,51 @@ document.addEventListener("wheel", (e) => {
     }
 }, { passive: false });
 
+const SWIPE_THRESHOLD = 50;
+const SWIPE_DIRECTION_RATIO = 1.5;
+let touchStartX = 0;
+let touchStartY = 0;
+let touchTracking = false;
+
+document.addEventListener("touchstart", (e) => {
+    if (e.target.closest(".side-menu, .top-bar, .reading-progress, .contents-grid, .alpha-nav, .alpha-flyout, .towatch-modal, .ctrl-panel, .ctrl-search-drop")) {
+        touchTracking = false;
+        return;
+    }
+    if (e.touches.length !== 1) {
+        touchTracking = false;
+        return;
+    }
+    touchTracking = true;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener("touchend", (e) => {
+    if (!touchTracking) return;
+    touchTracking = false;
+
+    const touch = e.changedTouches[0];
+    if (!touch) return;
+
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+
+    if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy) * SWIPE_DIRECTION_RATIO) return;
+
+    if (dx < 0) {
+        const next = findNextMatchingLeaf(flippedCount + 1, 1);
+        if (next !== -1) jumpToLeaf(next);
+    } else {
+        const prev = findNextMatchingLeaf(flippedCount - 1, -1);
+        if (prev !== -1) jumpToLeaf(prev);
+    }
+}, { passive: true });
+
+document.addEventListener("touchcancel", () => {
+    touchTracking = false;
+}, { passive: true });
+
 menuHomeButton.addEventListener("click", (e) => {
     e.stopPropagation();
 
