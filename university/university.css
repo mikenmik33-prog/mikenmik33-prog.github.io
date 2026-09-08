@@ -536,3 +536,237 @@ button {
         radial-gradient(circle at 96% 96%, rgba(0,0,0,.05), transparent 12%);
     mix-blend-mode: multiply;
 }
+
+/* =======================================================================
+   Responsive: tablet (<=768px)
+   ======================================================================= */
+@media (max-width: 768px) {
+    .university-scene {
+        padding: 24px 16px;
+    }
+
+    .university-notebook-spread {
+        min-height: 560px;
+    }
+
+    .university-notebook-page {
+        padding: 32px 0 34px;
+    }
+
+    .university-notebook-page--left .university-page-content {
+        margin: 0 22px 0 48px;
+    }
+
+    .university-notebook-page--right .university-page-content {
+        margin: 0 48px 0 22px;
+    }
+
+    .university-page-arrow {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .university-page-arrow--prev {
+        left: -12px;
+    }
+
+    .university-page-arrow--next {
+        right: -12px;
+    }
+
+    .university-back,
+    .university-notebook-delete,
+    .university-notebook-add {
+        width: 34px;
+        height: 34px;
+    }
+
+    .university-notebook-add {
+        top: 50px;
+    }
+
+    .university-format-toolbar {
+        top: 92px;
+        right: 8px;
+        gap: 6px;
+    }
+
+    .university-format-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+}
+
+/* =======================================================================
+   Responsive: phones (<=480px) - pages stack instead of a side-by-side spread
+   ======================================================================= */
+@media (max-width: 480px) {
+    .university-scene {
+        padding: 16px 12px 28px;
+    }
+
+    .university-notebook-wrap {
+        max-width: 480px;
+    }
+
+    .university-notebook-spread {
+        flex-direction: column;
+        min-height: 0;
+        border-radius: 10px;
+    }
+
+    .university-notebook-page {
+        padding: 26px 0 28px;
+    }
+
+    .university-notebook-page--left {
+        box-shadow: inset 0 -18px 22px -18px rgba(0,0,0,.32);
+    }
+
+    .university-notebook-page--right {
+        box-shadow: inset 0 18px 22px -18px rgba(0,0,0,.32);
+    }
+
+    .university-notebook-page--left::before,
+    .university-notebook-page--right::before {
+        left: 26px;
+        right: auto;
+    }
+
+    .university-notebook-page--left .university-page-content,
+    .university-notebook-page--right .university-page-content {
+        margin: 0 46px 0 46px;
+    }
+
+    .university-notebook-fold {
+        flex: 0 0 14px;
+        background: linear-gradient(
+            to bottom,
+            rgba(0,0,0,.12) 0%,
+            rgba(0,0,0,.04) 22%,
+            rgba(0,0,0,.02) 50%,
+            rgba(0,0,0,.04) 78%,
+            rgba(0,0,0,.12) 100%
+        );
+    }
+
+    .university-entry-text {
+        font-size: 20px;
+        line-height: 27px;
+    }
+
+    .university-page-content {
+        background-size: 100% 27px;
+    }
+
+    .university-page-arrow {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+    }
+
+    .university-page-arrow--prev {
+        left: -2px;
+    }
+
+    .university-page-arrow--next {
+        right: -2px;
+    }
+
+    .university-back,
+    .university-notebook-delete,
+    .university-notebook-add {
+        width: 30px;
+        height: 30px;
+    }
+
+    .university-notebook-add {
+        top: 44px;
+    }
+
+    .university-format-toolbar {
+        top: 82px;
+        right: 4px;
+        gap: 5px;
+    }
+
+    .university-format-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+    }
+
+    .university-page-number {
+        width: 46px;
+        height: 34px;
+        right: 6px;
+        bottom: 4px;
+    }
+
+    .university-page-number-text {
+        font-size: 18px;
+    }
+
+    .university-confirm-popup {
+        max-width: calc(100% - 24px);
+    }
+}
+
+/* =======================================================================
+   Responsive: small phones (<=360px)
+   ======================================================================= */
+@media (max-width: 360px) {
+    .university-scene {
+        padding: 12px 8px 24px;
+    }
+
+    .university-notebook-page--left .university-page-content,
+    .university-notebook-page--right .university-page-content {
+        margin: 0 40px 0 40px;
+    }
+
+    .university-notebook-page--left::before,
+    .university-notebook-page--right::before {
+        left: 24px;
+    }
+
+    .university-entry-text {
+        font-size: 18px;
+        line-height: 25px;
+    }
+
+    .university-page-content {
+        background-size: 100% 25px;
+    }
+
+    .university-back,
+    .university-notebook-delete,
+    .university-notebook-add {
+        width: 26px;
+        height: 26px;
+    }
+
+    .university-notebook-add {
+        top: 40px;
+    }
+
+    .university-format-toolbar {
+        top: 70px;
+        right: 4px;
+        gap: 4px;
+    }
+
+    .university-format-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+
+    .university-page-arrow {
+        width: 30px;
+        height: 30px;
+        font-size: 15px;
+    }
+}

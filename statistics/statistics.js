@@ -780,8 +780,8 @@ function renderDaily() {
           <span class="day-toggle-arrow">▶</span>
         </div>
         <div class="day-body"><div class="day-body-inner">
-        <table class="sales-table"><thead><tr><th>Назва</th><th>Продано, шт</th><th>Прибуток</th><th>ROI</th><th></th></tr></thead>
-        <tbody>${rows}</tbody></table>
+        <div class="table-scroll"><table class="sales-table"><thead><tr><th>Назва</th><th>Продано, шт</th><th>Прибуток</th><th>ROI</th><th></th></tr></thead>
+        <tbody>${rows}</tbody></table></div>
         </div></div>
       </div>`;
               })

@@ -1348,3 +1348,294 @@ body:has(.towatch-modal.open) .alpha-nav {
     text-align: center;
     padding: 0 24px;
 }
+
+/* =========================================================
+   RESPONSIVE — tablet & phone
+   ========================================================= */
+
+/* ---------- Tablet tier (<=900px): compact the fixed chrome
+   so the labelled side-menu / alpha-nav no longer overlap the
+   magazine box, and give the magazine box real, px-based
+   clearance instead of a pure vw margin. ---------- */
+@media (max-width: 900px) {
+    :root {
+        --magazine-w: min(calc(100vw - 130px), 900px);
+        --magazine-h: min(86vh, 700px);
+    }
+
+    .ctrl-panel {
+        left: 14px;
+        top: 14px;
+    }
+
+    .top-bar {
+        right: 14px;
+        top: 14px;
+    }
+
+    .side-menu {
+        right: 10px;
+        padding: 4px;
+        gap: 2px;
+    }
+
+    .side-menu-btn {
+        padding: 9px 8px;
+    }
+
+    .side-menu-label {
+        display: none;
+    }
+
+    .alpha-nav {
+        left: 10px;
+        padding: 6px 3px;
+    }
+
+    .alpha-nav-btn {
+        padding: 3px 5px;
+        font-size: .62rem;
+    }
+
+    .leaf-spread .desc {
+        padding: 40px 30px 40px;
+    }
+}
+
+/* ---------- Below 600px the two-page spread (poster | text)
+   can no longer live side by side — stack it into one column:
+   poster on top, description below with its own scroll. ---------- */
+@media (max-width: 600px) {
+    .leaf-spread {
+        flex-direction: column;
+    }
+
+    .leaf-spread::after {
+        display: none;
+    }
+
+    .leaf-spread .sheet {
+        width: 100%;
+    }
+
+    .leaf-spread .sheet.left {
+        flex: 0 0 34%;
+        min-height: 140px;
+        border-right: none;
+        border-bottom: 1px solid var(--chrome-border);
+        box-shadow: inset 0 -10px 16px -12px rgba(0, 0, 0, 0.6);
+    }
+
+    .leaf-spread .sheet.right {
+        flex: 1 1 auto;
+        min-height: 0;
+        border-left: none;
+        border-top: 1px solid var(--chrome-border);
+        box-shadow: inset 0 10px 16px -12px rgba(0, 0, 0, 0.6);
+    }
+
+    .leaf-spread .desc {
+        padding: 22px 18px 28px;
+    }
+
+    .cat-accent {
+        flex-wrap: wrap;
+        row-gap: 8px;
+    }
+}
+
+/* ---------- Phone tier (<=480px): tighten every fixed UI
+   cluster so the header row (back/bookmark/sort/search vs.
+   page-indicator/lang) never overlaps, shrink the side rails
+   further, and rescale the cover / stats / contents type. ---------- */
+@media (max-width: 480px) {
+    :root {
+        --magazine-w: min(calc(100vw - 92px), 900px);
+        --magazine-h: min(80vh, 700px);
+    }
+
+    .magazine-shell {
+        margin-top: 16px;
+        gap: 10px;
+    }
+
+    /* header chrome */
+    .ctrl-panel {
+        left: 8px;
+        top: 8px;
+        gap: 0;
+    }
+
+    .brand-icon-back,
+    .brand-icon-towatch,
+    .brand-icon-sort,
+    .ctrl-search-toggle {
+        width: 30px;
+        height: 30px;
+    }
+
+    .top-bar {
+        right: 8px;
+        top: 8px;
+        gap: 6px;
+    }
+
+    .page-indicator {
+        padding: 7px 9px;
+        font-size: .64rem;
+    }
+
+    .lang-switch {
+        padding: 2px;
+    }
+
+    .lang-option {
+        padding: 6px 9px;
+        font-size: .58rem;
+    }
+
+    .ctrl-panel.search-open .brand-icon-back,
+    .ctrl-panel.search-open .brand-icon-towatch,
+    .ctrl-panel.search-open .brand-icon-sort,
+    .ctrl-panel.search-open .ctrl-sep {
+        display: none;
+    }
+
+    .ctrl-panel.search-open .ctrl-search-input {
+        width: 34vw;
+        min-width: 90px;
+    }
+
+    .ctrl-search-drop {
+        left: 8px;
+        top: 46px;
+        width: min(270px, calc(100vw - 16px));
+    }
+
+    /* side rails */
+    .side-menu {
+        right: 4px;
+        padding: 3px;
+    }
+
+    .side-menu-btn {
+        padding: 8px 6px;
+    }
+
+    .side-menu-icon svg {
+        width: 17px;
+        height: 17px;
+    }
+
+    .alpha-nav {
+        left: 4px;
+        padding: 5px 2px;
+        max-height: 68vh;
+    }
+
+    .alpha-nav-btn {
+        padding: 2px 4px;
+        font-size: .56rem;
+    }
+
+    .alpha-flyout {
+        min-width: 190px;
+        max-width: min(280px, calc(100vw - 64px));
+    }
+
+    /* reading progress bar: pack the (many) segments tighter */
+    .reading-progress {
+        height: 16px;
+        gap: 1px;
+        padding: 0 6px;
+    }
+
+    .progress-segment {
+        min-width: 1px;
+    }
+
+    /* cover */
+    .leaf-cover .cover-face {
+        padding: 26px 16px;
+    }
+
+    .cover-top {
+        flex-wrap: wrap;
+        row-gap: 6px;
+        font-size: .54rem;
+        letter-spacing: .16em;
+    }
+
+    .cover-title-small {
+        white-space: normal;
+        text-align: center;
+    }
+
+    .cover-divider-line {
+        min-width: 14px;
+    }
+
+    .cover-logo {
+        font-size: clamp(30px, 13vw, 64px);
+    }
+
+    .stats-panel {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .stat {
+        padding: 14px 6px 12px;
+    }
+
+    .number {
+        font-size: 26px;
+    }
+
+    .label {
+        margin-top: 6px;
+        font-size: .52rem;
+    }
+
+    /* contents page */
+    .leaf-contents .contents-face {
+        padding: 30px 14px 26px;
+    }
+
+    .contents-title {
+        margin-bottom: 18px;
+    }
+
+    .contents-grid {
+        padding-right: 2px;
+    }
+
+    /* modals */
+    .towatch-modal-panel {
+        width: min(94vw, 480px);
+        padding: 16px;
+    }
+
+    .towatch-modal-header h2 {
+        font-size: 1.2rem;
+    }
+}
+
+/* ---------- Extra-narrow phones ---------- */
+@media (max-width: 360px) {
+    :root {
+        --magazine-w: min(calc(100vw - 78px), 900px);
+    }
+
+    .side-menu-btn {
+        padding: 7px 5px;
+    }
+
+    .alpha-nav-btn {
+        padding: 2px 3px;
+        font-size: .52rem;
+    }
+
+    .leaf-spread .desc {
+        padding: 18px 14px 24px;
+    }
+}
