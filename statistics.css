@@ -1325,34 +1325,6 @@ html::-webkit-scrollbar-thumb:hover {
     color: #e9edd8;
 }
 
-@media (max-width: 860px) {
-    #entryForm {
-        grid-template-columns: 1fr;
-    }
-
-    .buy-row {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .buy-row:has(.buy-row-remove[data-hidden="1"]) {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .buy-row-name-field,
-    .buy-row-mode-field {
-        grid-column: 1 / -1;
-    }
-
-    .buy-row-remove-field {
-        grid-column: 1 / -1;
-        justify-self: end;
-    }
-
-    .buy-row-remove-field .buy-row-label-spacer {
-        display: none;
-    }
-}
-
 .top-cases-list {
     margin: 0 18px 18px;
     display: flex;
@@ -1738,4 +1710,18 @@ html::-webkit-scrollbar-thumb:hover {
     color: #7d8695;
     font-size: 11px;
     font-weight: 700;
+}
+
+@media (max-width: 960px) {
+    .app {
+        padding: 14px 12px 20px;
+    }
+
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }

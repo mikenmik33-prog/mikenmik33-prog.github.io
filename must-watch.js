@@ -224,14 +224,6 @@ if (towatchModal) {
     }, { passive: false });
 }
 
-document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-        closeTowatchModal();
-        closeRatingModal();
-        closeSearch();
-    }
-});
-
 const sortToggle = document.getElementById("sortToggle");
 const ratingModal = document.getElementById("ratingModal");
 const ratingClose = document.getElementById("ratingClose");
@@ -706,13 +698,6 @@ function initStatsPanelInteraction() {
             e.stopPropagation();
             setCategoryFilter(category);
         });
-
-        statEl.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                setCategoryFilter(category);
-            }
-        });
     });
 }
 
@@ -986,12 +971,6 @@ document.addEventListener("click", (e) => {
     if (!alphaFlyoutLetter) return;
     if (e.target.closest(".alpha-nav, .alpha-flyout")) return;
     closeAlphaFlyout();
-});
-
-document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-        closeAlphaFlyout();
-    }
 });
 
 const WHEEL_THRESHOLD = 24;
