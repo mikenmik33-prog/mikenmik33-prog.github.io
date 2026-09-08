@@ -17,6 +17,7 @@
                 <div class="brand-title">Журнал угод</div>
             </div>
             <div class="top-actions">
+                <button class="backup-btn" hidden="" id="cloudSyncBtn" title="Синхронізація між пристроями" type="button">☁ Увійти</button>
                 <button class="backup-btn" id="exportBtn" title="Зберегти резервну копію даних" type="button">⤓ Зберегти копію</button>
                 <button class="backup-btn" id="importBtn" title="Відновити дані з файлу" type="button">⤒ Відновити</button>
                 <input accept="application/json" hidden="" id="importFile" type="file"/>
@@ -171,6 +172,29 @@
             <div class="case-buys-total" id="caseBuysTotal"></div>
         </div>
     </div>
+    <div class="sell-modal-backdrop" id="authModal">
+        <div class="sell-modal">
+            <div class="sell-modal-head">
+                <div class="sell-modal-title">Синхронізація між пристроями</div>
+                <button class="sell-close" id="authClose" type="button">×</button>
+            </div>
+            <div class="sell-form">
+                <div class="sell-field" style="grid-column:1/-1">
+                    <label>Email</label>
+                    <input autocomplete="email" id="authEmail" type="email"/>
+                </div>
+                <div class="sell-field" style="grid-column:1/-1">
+                    <label>Пароль</label>
+                    <input autocomplete="current-password" id="authPassword" type="password"/>
+                </div>
+            </div>
+            <div class="sell-error" id="authError"></div>
+            <div class="sell-actions">
+                <button class="sell-cancel" id="authRegisterBtn" type="button">Зареєструватися</button>
+                <button class="sell-confirm" id="authSignInBtn" type="button">Увійти</button>
+            </div>
+        </div>
+    </div>
     <template id="buyRowTemplate">
         <div class="buy-row" data-mode="buy">
             <div class="buy-row-field buy-row-mode-field">
@@ -225,6 +249,10 @@
         <div class="price-total-sum"></div>
     </template>
 
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
     <script src="statistics.js"></script>
 </body>
 </html>

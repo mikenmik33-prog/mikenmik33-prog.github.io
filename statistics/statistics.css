@@ -230,6 +230,11 @@ html::-webkit-scrollbar-thumb:hover {
     transform: translateY(1px);
 }
 
+#cloudSyncBtn[data-state="synced"] {
+    border-color: #1f3a2a;
+    color: #4ade80;
+}
+
 .table-scroll {
     width: 100%;
     overflow-x: auto;

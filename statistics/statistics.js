@@ -283,6 +283,7 @@ function loadEntries() {
 }
 function saveEntries() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    queueCloudSync();
 }
 let entries = loadEntries();
 function repairForcedClosureBuyKop() {
@@ -1682,3 +1683,160 @@ updateCurrentTime();
 setInterval(updateCurrentTime, 1000);
 
 render();
+
+// ---------- Синхронізація між пристроями (Firebase) ----------
+
+let cloudDocRef = null;
+let cloudUnsubscribe = null;
+let cloudSyncTimer = null;
+let applyingRemoteSnapshot = false;
+
+function isCloudConfigured() {
+    const cfg = window.FIREBASE_CONFIG;
+    return !!(cfg && cfg.apiKey && cfg.apiKey !== "YOUR_API_KEY" && window.firebase);
+}
+
+function queueCloudSync() {
+    if (applyingRemoteSnapshot || !cloudDocRef) return;
+    clearTimeout(cloudSyncTimer);
+    cloudSyncTimer = setTimeout(() => {
+        cloudDocRef.set({ entries, updatedAt: Date.now() }).catch((e) => {
+            console.error("Не вдалося синхронізувати дані з хмарою:", e);
+        });
+    }, 500);
+}
+
+function setCloudButtonState(state, label) {
+    const btn = document.getElementById("cloudSyncBtn");
+    if (!btn) return;
+    btn.hidden = false;
+    btn.dataset.state = state;
+    btn.textContent = label;
+}
+
+function subscribeCloudEntries(docRef) {
+    if (cloudUnsubscribe) cloudUnsubscribe();
+    cloudDocRef = docRef;
+    cloudUnsubscribe = docRef.onSnapshot((snap) => {
+        if (!snap.exists) return;
+        const remoteEntries = normalizeEntries(snap.data().entries || []);
+        if (JSON.stringify(remoteEntries) === JSON.stringify(entries)) return;
+
+        applyingRemoteSnapshot = true;
+        entries = remoteEntries;
+        saveEntries();
+        applyingRemoteSnapshot = false;
+        render();
+    }, (e) => {
+        console.error("Помилка синхронізації з хмарою:", e);
+    });
+}
+
+async function initCloudForUser(user) {
+    const db = firebase.firestore();
+    const docRef = db.collection("users").doc(user.uid).collection("ledger").doc("entries");
+
+    setCloudButtonState("synced", "☁ " + user.email);
+
+    const snap = await docRef.get();
+    if (!snap.exists) {
+        await docRef.set({ entries, updatedAt: Date.now() });
+    } else {
+        const remoteEntries = normalizeEntries(snap.data().entries || []);
+        const differs = JSON.stringify(remoteEntries) !== JSON.stringify(entries);
+        if (differs && entries.length > 0) {
+            const proceed = confirm(
+                "У хмарі вже є збережені дані з іншого пристрою.\n\n" +
+                "Завантажити їх і замінити поточні локальні дані на цьому пристрої?\n\n" +
+                "Натисніть «Скасувати», щоб спочатку зберегти копію локальних даних кнопкою «Зберегти копію».",
+            );
+            if (!proceed) {
+                await firebase.auth().signOut();
+                return;
+            }
+        }
+        applyingRemoteSnapshot = true;
+        entries = remoteEntries;
+        saveEntries();
+        applyingRemoteSnapshot = false;
+        render();
+    }
+
+    subscribeCloudEntries(docRef);
+}
+
+function teardownCloud() {
+    if (cloudUnsubscribe) cloudUnsubscribe();
+    cloudUnsubscribe = null;
+    cloudDocRef = null;
+    setCloudButtonState("signed-out", "☁ Увійти");
+}
+
+if (isCloudConfigured()) {
+    firebase.initializeApp(window.FIREBASE_CONFIG);
+    try {
+        firebase.firestore().enablePersistence({ synchronizeTabs: true }).catch(() => {});
+    } catch (e) {}
+
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            initCloudForUser(user);
+        } else {
+            teardownCloud();
+        }
+    });
+
+    const authModal = document.getElementById("authModal");
+    const authEmail = document.getElementById("authEmail");
+    const authPassword = document.getElementById("authPassword");
+    const authError = document.getElementById("authError");
+
+    function openAuthModal() {
+        authError.textContent = "";
+        authModal.classList.add("open");
+    }
+    function closeAuthModal() {
+        authModal.classList.remove("open");
+    }
+
+    document.getElementById("cloudSyncBtn").addEventListener("click", () => {
+        if (firebase.auth().currentUser) {
+            if (confirm("Вийти з синхронізації на цьому пристрої? Локальні дані залишаться на місці.")) {
+                firebase.auth().signOut();
+            }
+            return;
+        }
+        openAuthModal();
+    });
+
+    document.getElementById("authClose").addEventListener("click", closeAuthModal);
+    authModal.addEventListener("click", (e) => {
+        if (e.target.id === "authModal") closeAuthModal();
+    });
+
+    function authFail(e) {
+        const messages = {
+            "auth/invalid-email": "Некоректний email.",
+            "auth/user-not-found": "Користувача з таким email не знайдено.",
+            "auth/wrong-password": "Неправильний пароль.",
+            "auth/invalid-credential": "Неправильний email або пароль.",
+            "auth/email-already-in-use": "Такий email вже зареєстровано — натисніть «Увійти».",
+            "auth/weak-password": "Пароль має містити щонайменше 6 символів.",
+        };
+        authError.textContent = messages[e.code] || "Помилка: " + e.message;
+    }
+
+    document.getElementById("authSignInBtn").addEventListener("click", () => {
+        authError.textContent = "";
+        firebase.auth().signInWithEmailAndPassword(authEmail.value.trim(), authPassword.value)
+            .then(closeAuthModal)
+            .catch(authFail);
+    });
+
+    document.getElementById("authRegisterBtn").addEventListener("click", () => {
+        authError.textContent = "";
+        firebase.auth().createUserWithEmailAndPassword(authEmail.value.trim(), authPassword.value)
+            .then(closeAuthModal)
+            .catch(authFail);
+    });
+}
