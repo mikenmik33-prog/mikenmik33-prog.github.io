@@ -48,11 +48,6 @@ function buildCalendarCells(year, month, selectedDs, todayDs) {
     return cells;
 }
 
-function setDateValue(input, value) {
-    input.value = value;
-    if (input._syncDatePicker) input._syncDatePicker();
-}
-
 function attachDatePicker(input) {
     if (!input || input.dataset.pickerAttached) return;
     input.dataset.pickerAttached = "1";
@@ -305,10 +300,6 @@ function repairForcedClosureBuyKop() {
 }
 repairForcedClosureBuyKop();
 
-// Зводить докупи однакові партії: та сама назва, та сама дата, та сама ціна
-// за штуку і нічого ще не продано. Партії з різною ціною або різною датою не
-// чіпає — на першому тримається собівартість продажів (FIFO), на другій —
-// KPI «Витрачено» за період.
 function consolidateEntries() {
     const kept = [];
     let changed = false;
@@ -318,7 +309,6 @@ function consolidateEntries() {
             return;
         }
         const key = groupKey(e.name);
-        // e.buyKop / e.qty === t.buyKop / t.qty, але без ділення й похибок float
         const target = kept.find(
             (t) =>
                 soldQty(t) === 0 &&
@@ -417,10 +407,6 @@ function groupKey(name) {
     return name.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
-// Єдиний список 18 «своїх» кейсів. Тільки вони враховуються у СТАТИСТИЦІ
-// КІЛЬКОСТІ (KPI «Продано, к-сть», модалка «Продано кейсів за весь час»,
-// «Топ-3 кейси»). Будь-які інші предмети можна купувати, продавати, редагувати
-// й видаляти — вони просто йдуть лише у грошову статистику.
 const KNOWN_CASES = [
     { canonical: "Форсаж", aliases: ["форсаж"] },
     { canonical: "Темні справи", aliases: ["темні справи", "тд"] },
@@ -483,9 +469,6 @@ function getAllKnownCaseNames() {
     return map;
 }
 
-// Підказує схожу вже наявну назву кейса, щоб описка (напр. "Форсаш" замість
-// "Форсаж") не створювала окрему групу в інвентарі. Ігнорує короткі назви й
-// назви з цифрами (ВН1/ВН2, ЄС тощо навмисно схожі — це різні кейси).
 function findSimilarCaseName(typedName) {
     const typedKey = groupKey(typedName || "");
     if (typedKey.length < 3 || /\d/.test(typedKey)) return null;
@@ -956,10 +939,6 @@ document.getElementById("caseBuysClose").addEventListener("click", closeCaseBuys
 document.getElementById("caseBuysModal").addEventListener("click", (e) => {
     if (e.target.id === "caseBuysModal") closeCaseBuysModal();
 });
-document.addEventListener("keydown", (e) => {
-    if (!document.getElementById("caseBuysModal").classList.contains("open")) return;
-    if (e.key === "Escape") closeCaseBuysModal();
-});
 
 function renderChart() {
     const period = currentChartPeriod();
@@ -1083,9 +1062,7 @@ chartPeriodOptions.forEach((btn) =>
 document.addEventListener("click", (e) => {
     if (!chartPeriodWrap.contains(e.target)) closeChartPeriod();
 });
-document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeChartPeriod();
-});
+
 syncChartPeriodUI();
 
 const entrySubmitBtn = document.getElementById("entrySubmitBtn");
@@ -1110,7 +1087,7 @@ function createBuyRowEl(data) {
     const qtyValue =
         sold > 0 ? Math.max(0, totalBought - sold) : data.qty != null ? data.qty : 1;
     row.querySelector(".buy-row-name").value = data.name || "";
-    row.querySelector(".buy-row-qty").value = data.qty != null ? qtyValue : "";
+    row.querySelector(".buy-row-qty").value = qtyValue;
     row.querySelector(".buy-row-date").value = data.date || todayStr();
     row.querySelector(".buy-row-buy").value = data.buy != null ? data.buy : "";
     row.querySelector(".buy-row-qty").addEventListener("input", (e) => {
@@ -1121,8 +1098,11 @@ function createBuyRowEl(data) {
     const nameInput = row.querySelector(".buy-row-name");
     const caseSelect = row.querySelector(".buy-row-case-select");
     const buyInput = row.querySelector(".buy-row-buy");
+    const qtyInput = row.querySelector(".buy-row-qty");
     const suggestEl = row.querySelector(".buy-row-suggest");
     const modeBtns = [...row.querySelectorAll(".buy-row-mode-btn")];
+    const nameLabel = row.querySelector(".buy-row-name-field .buy-row-label");
+    const sumLabel = row.querySelector(".buy-row-sum-label");
     function setRowMode(mode) {
         row.dataset.mode = mode;
         const isSell = mode === "sell";
@@ -1131,10 +1111,11 @@ function createBuyRowEl(data) {
         caseSelect.hidden = !isSell;
         suggestEl.hidden = true;
         suggestEl.textContent = "";
-        buyInput.placeholder = isSell ? "Отримав за все" : "Сума за все";
+        if (nameLabel) nameLabel.textContent = isSell ? "Кейс" : "Назва кейса";
+        if (sumLabel) sumLabel.textContent = isSell ? "Отримав за все, ₴" : "Сума за все, ₴";
         if (isSell) populateRowCaseSelect(caseSelect);
     }
-    modeBtns.forEach((btn) => btn.addEventListener("click", () => setRowMode(btn.dataset.rowMode)));
+    modeBtns.forEach((btn) => btn.addEventListener("click", () => { setRowMode(btn.dataset.rowMode); updateOperationTheme(); }));
     caseSelect.addEventListener("mousedown", () => populateRowCaseSelect(caseSelect));
     setRowMode(data.mode || "buy");
     nameInput.addEventListener("input", () => {
@@ -1158,6 +1139,31 @@ function createBuyRowEl(data) {
     });
     return row;
 }
+function updateOperationTheme() {
+    const rows = [...document.querySelectorAll("#buyRows .buy-row")];
+    const hasBuy = rows.some((r) => r.dataset.mode === "buy");
+    const hasSell = rows.some((r) => r.dataset.mode === "sell");
+    const panel = document.querySelector(".operation");
+    if (!panel) return;
+    panel.classList.remove("theme-buy", "theme-sell", "theme-mixed");
+    const root = document.documentElement.style;
+    if (hasBuy && hasSell) {
+        panel.classList.add("theme-mixed");
+        root.setProperty("--scroll-thumb", "#8ab35a");
+        root.setProperty("--scroll-thumb-bg", "linear-gradient(180deg, rgba(74,222,128,.55), rgba(251,146,60,.55))");
+        root.setProperty("--scroll-thumb-bg-hover", "linear-gradient(180deg, rgba(74,222,128,.85), rgba(251,146,60,.85))");
+    } else if (hasSell) {
+        panel.classList.add("theme-sell");
+        root.setProperty("--scroll-thumb", "rgba(251,146,60,.4)");
+        root.setProperty("--scroll-thumb-bg", "rgba(251,146,60,.4)");
+        root.setProperty("--scroll-thumb-bg-hover", "rgba(251,146,60,.7)");
+    } else {
+        panel.classList.add("theme-buy");
+        root.setProperty("--scroll-thumb", "rgba(74,222,128,.4)");
+        root.setProperty("--scroll-thumb-bg", "rgba(74,222,128,.4)");
+        root.setProperty("--scroll-thumb-bg-hover", "rgba(74,222,128,.7)");
+    }
+}
 function updateBuyRowRemoveVisibility(container) {
     const rows = [...container.querySelectorAll(".buy-row")];
     rows.forEach((r) => {
@@ -1168,6 +1174,7 @@ function updateBuyRowRemoveVisibility(container) {
 function addBuyRow(container, data) {
     container.appendChild(createBuyRowEl(data));
     updateBuyRowRemoveVisibility(container);
+    updateOperationTheme();
 }
 function resetBuyRows() {
     const container = document.getElementById("buyRows");
@@ -1180,6 +1187,7 @@ document.getElementById("buyRows").addEventListener("click", (e) => {
     const container = document.getElementById("buyRows");
     btn.closest(".buy-row").remove();
     updateBuyRowRemoveVisibility(container);
+    updateOperationTheme();
 });
 document.getElementById("addBuyRowBtn").addEventListener("click", () => {
     addBuyRow(document.getElementById("buyRows"));
@@ -1234,9 +1242,7 @@ document.getElementById("entryForm").addEventListener("submit", (e) => {
             buyRows.push({ name, buyTotal: amount, qty, date: rowDate });
         }
     }
-    // Перевіряємо, чи вистачає залишку на всі рядки продажу разом (якщо
-    // кілька рядків продають один і той самий кейс), ще до того, як
-    // почнемо щось змінювати — щоб не вийшло "напів застосованої" операції.
+
     const availableByCase = {};
     getCaseGroups().forEach((g) => (availableByCase[g.key] = g.qty));
     const requestedByCase = {};
@@ -1313,14 +1319,11 @@ function renderTopCases() {
 }
 
 let activeEditBuyOriginalIds = [];
+let activeEditBuyName = "";
 function editBuyRowsContainer() {
     return document.getElementById("editBuyRows");
 }
 
-// Партії — деталь зберігання, а не те, чим оперує користувач. Модалка показує
-// їх згорнутими в групи за ціною за штуку: скільки всього штук куплено по цій
-// ціні, незалежно від того, за скільки заходів і в які дні. Дати лишаються в
-// самих партіях, щоб KPI «Витрачено» за період не поплив.
 function unitPriceKey(buyKop, qty) {
     return qty > 0 ? (buyKop / qty).toFixed(4) : "0";
 }
@@ -1345,14 +1348,18 @@ function buildPriceGroups(groupEntries) {
 function createPriceRowEl(g) {
     const row = cloneTemplate("priceRowTemplate");
     const remaining = g ? g.qty - g.sold : 1;
+    const soldKop = g ? Math.round((g.buyKop * g.sold) / (g.qty || 1)) : 0;
+    const remainingKop = g ? g.buyKop - soldKop : 0;
     row.querySelector(".price-row-qty").value = g ? remaining : "";
-    row.querySelector(".price-row-sum").value = g ? formatNumberInput(String(g.buyKop / 100)) : "";
+    row.querySelector(".price-row-sum").value = g ? formatNumberInput(String(remainingKop / 100)) : "";
     if (g) {
         row.dataset.entryIds = g.entries.map((e) => e.id).join(",");
         row.dataset.sold = String(g.sold);
+        row.dataset.soldKop = String(soldKop);
     } else {
         row.dataset.entryIds = "";
         row.dataset.sold = "0";
+        row.dataset.soldKop = "0";
     }
     const qtyEl = row.querySelector(".price-row-qty");
     const sumEl = row.querySelector(".price-row-sum");
@@ -1362,10 +1369,12 @@ function createPriceRowEl(g) {
     attachThousandsFormatting(sumEl);
     function syncUnit() {
         const sold = Number(row.dataset.sold || 0);
+        const soldSumKop = Number(row.dataset.soldKop || 0);
         const qty = sold + (parseInt(qtyEl.value || "0", 10) || 0);
-        const sum = parseFloat(unformatNumberInput(sumEl.value));
-        const ok = qty > 0 && !isNaN(sum);
-        row.querySelector(".price-row-unit-value").textContent = ok ? fmt(sum / qty) : "";
+        const remainingSum = parseFloat(unformatNumberInput(sumEl.value));
+        const ok = qty > 0 && !isNaN(remainingSum);
+        const totalSum = ok ? remainingSum + soldSumKop / 100 : NaN;
+        row.querySelector(".price-row-unit-value").textContent = ok ? fmt(totalSum / qty) : "";
         row.querySelector(".price-row-unit-suffix").hidden = !ok;
     }
     qtyEl.addEventListener("input", syncUnit);
@@ -1379,14 +1388,13 @@ function refreshEditBuySummary() {
     let qty = 0,
         sum = 0;
     rows.forEach((r) => {
-        const sold = Number(r.dataset.sold || 0);
-        qty += sold + (parseInt(r.querySelector(".price-row-qty").value || "0", 10) || 0);
-        const v = parseFloat(unformatNumberInput(r.querySelector(".price-row-sum").value));
-        if (!isNaN(v)) sum += v;
+        const remaining = parseInt(r.querySelector(".price-row-qty").value || "0", 10) || 0;
+        const remainingSum = parseFloat(unformatNumberInput(r.querySelector(".price-row-sum").value));
+        qty += remaining;
+        if (!isNaN(remainingSum)) sum += remainingSum;
     });
     const el = document.getElementById("editBuyTotal");
     if (!el) return;
-    // За однієї ціни підсумок дослівно повторює єдиний рядок — не показуємо.
     if (rows.length < 2) {
         el.innerHTML = "";
         return;
@@ -1408,11 +1416,12 @@ function openEditBuyModal(entryId) {
         .sort((a, b) => new Date(a.date) - new Date(b.date) || a.createdAt - b.createdAt);
     if (!groupEntries.length) return;
     activeEditBuyOriginalIds = groupEntries.map((e) => e.id);
+    activeEditBuyName = baseEntry.name;
     const container = editBuyRowsContainer();
     container.innerHTML = "";
     buildPriceGroups(groupEntries).forEach((g) => container.appendChild(createPriceRowEl(g)));
     const nameEl = document.getElementById("editBuyName");
-    if (nameEl) nameEl.value = baseEntry.name;
+    if (nameEl) nameEl.textContent = baseEntry.name;
     document.getElementById("editBuyError").textContent = "";
     refreshEditBuySummary();
     document.getElementById("editBuyModal").classList.add("open");
@@ -1426,14 +1435,7 @@ document.getElementById("editBuyCancel").addEventListener("click", closeEditBuyM
 document.getElementById("editBuyModal").addEventListener("click", (e) => {
     if (e.target.id === "editBuyModal") closeEditBuyModal();
 });
-document.addEventListener("keydown", (e) => {
-    if (!document.getElementById("editBuyModal").classList.contains("open")) return;
-    if (e.key === "Escape") closeEditBuyModal();
-    else if (e.key === "Enter" && e.target.tagName === "INPUT") {
-        e.preventDefault();
-        document.getElementById("editBuyConfirm").click();
-    }
-});
+
 editBuyRowsContainer().addEventListener("input", refreshEditBuySummary);
 editBuyRowsContainer().addEventListener("click", (e) => {
     const btn = e.target.closest(".price-row-remove");
@@ -1447,10 +1449,7 @@ editBuyRowsContainer().addEventListener("click", (e) => {
     row.remove();
     refreshEditBuySummary();
 });
-// Розкидає нову кількість і суму групи по її партіях. Партії з продажами не
-// можуть опуститись нижче за вже продане; зайве знімається з найновіших, а
-// приріст лягає на найновішу. Сума ділиться пропорційно кількості, залишок від
-// округлення — на останню партію.
+
 function applyPriceGroup(groupEntries, newQty, newBuyKop) {
     const ordered = [...groupEntries].sort(
         (a, b) => new Date(a.date) - new Date(b.date) || a.createdAt - b.createdAt,
@@ -1478,11 +1477,7 @@ function applyPriceGroup(groupEntries, newQty, newBuyKop) {
 document.getElementById("editBuyConfirm").addEventListener("click", () => {
     const err = document.getElementById("editBuyError");
     err.textContent = "";
-    const name = document.getElementById("editBuyName").value.trim();
-    if (!name) {
-        err.textContent = "Впишіть назву";
-        return;
-    }
+    const name = activeEditBuyName;
     const rowEls = [...editBuyRowsContainer().querySelectorAll(".price-row")];
     if (!rowEls.length) {
         err.textContent = "Має лишитись хоча б одна ціна";
@@ -1491,12 +1486,13 @@ document.getElementById("editBuyConfirm").addEventListener("click", () => {
     const plan = [];
     for (const rowEl of rowEls) {
         const sold = Number(rowEl.dataset.sold || 0);
+        const soldSumKop = Number(rowEl.dataset.soldKop || 0);
         const ids = rowEl.dataset.entryIds ? rowEl.dataset.entryIds.split(",") : [];
         const groupEntries = ids.map((id) => entries.find((x) => x.id === id)).filter(Boolean);
         const qtyInput = parseInt(rowEl.querySelector(".price-row-qty").value || "0", 10);
         const sumRaw = rowEl.querySelector(".price-row-sum").value.trim();
-        const sumTotal = sumRaw === "" ? NaN : parseFloat(unformatNumberInput(sumRaw));
-        if (isNaN(sumTotal) || sumTotal < 0) {
+        const remainingSum = sumRaw === "" ? NaN : parseFloat(unformatNumberInput(sumRaw));
+        if (isNaN(remainingSum) || remainingSum < 0) {
             err.textContent = "Сума має бути числом";
             return;
         }
@@ -1505,7 +1501,7 @@ document.getElementById("editBuyConfirm").addEventListener("click", () => {
             return;
         }
         const newQty = sold + qtyInput;
-        const newBuyKop = toKopecks(sumTotal);
+        const newBuyKop = toKopecks(remainingSum) + soldSumKop;
         if (groupEntries.length) {
             const alloc = applyPriceGroup(groupEntries, newQty, newBuyKop);
             for (const a of alloc) {
@@ -1541,8 +1537,7 @@ document.getElementById("editBuyConfirm").addEventListener("click", () => {
             keptIds.add(a.entry.id);
         });
     });
-    // Рядки, прибрані хрестиком: без продажів — геть, з продажами — обрізаємо
-    // до вже проданого, щоб історія продажів і їх собівартість лишились цілими.
+
     activeEditBuyOriginalIds.forEach((id) => {
         if (keptIds.has(id)) return;
         const en = entries.find((x) => x.id === id);
@@ -1555,7 +1550,7 @@ document.getElementById("editBuyConfirm").addEventListener("click", () => {
             en.qty = 0;
         }
     });
-    // Порожні партії без жодного продажу більше ні на що не впливають.
+
     entries = entries.filter((e) => e.qty > 0 || soldQty(e) > 0);
     entries.forEach((e) => {
         if (keptIds.has(e.id)) e.name = name;
@@ -1634,14 +1629,7 @@ document.getElementById("editSaleModal").addEventListener("click", (e) => {
 document.getElementById("editSaleQty").addEventListener("input", (e) => {
     e.target.value = e.target.value.replace(/[^\d]/g, "");
 });
-document.addEventListener("keydown", (e) => {
-    if (!document.getElementById("editSaleModal").classList.contains("open")) return;
-    if (e.key === "Escape") closeEditSaleModal();
-    else if (e.key === "Enter" && e.target.tagName === "INPUT") {
-        e.preventDefault();
-        document.getElementById("editSaleConfirm").click();
-    }
-});
+
 attachThousandsFormatting(document.getElementById("editSalePrice"));
 document.getElementById("editSaleConfirm").addEventListener("click", () => {
     if (!activeEditSaleRefs) return;

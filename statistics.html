@@ -78,9 +78,10 @@
                     </div>
                     <div class="chart-meta" id="chartMeta"></div>
                 </div>
-                <div class="panel operation">
+                <div class="panel operation theme-buy">
                     <div class="operation-head">
                         <div class="operation-title">Додати операцію</div>
+                        <button class="add-btn" id="entrySubmitBtn" title="Додати" type="submit" form="entryForm"><span class="add-btn-icon">＋</span><span class="add-btn-text">Додати</span></button>
                     </div>
                     <div class="form-shell">
                         <form id="entryForm">
@@ -89,8 +90,7 @@
                                     <div class="buy-rows" id="buyRows"></div>
                                 </div>
                             </div>
-                            <button class="add-btn" id="entrySubmitBtn" title="Додати" type="submit">＋</button>
-                            <button class="add-row-btn" id="addBuyRowBtn" type="button">＋ Додати ще один кейс</button>
+                            <button class="add-row-btn" id="addBuyRowBtn" type="button"><span class="add-row-btn-icon">＋</span>Додати ще один кейс</button>
                             <div class="form-error" id="formError"></div>
                         </form>
                     </div>
@@ -136,7 +136,7 @@
         <div class="sell-modal">
             <div class="sell-modal-head">
                 <div class="edit-buy-head">
-                    <input class="edit-buy-name" id="editBuyName" placeholder="Назва" type="text"/>
+                    <div class="edit-buy-name" id="editBuyName"></div>
                 </div>
                 <button class="sell-close" id="editBuyClose" type="button">×</button>
             </div>
@@ -171,27 +171,37 @@
     </div>
     <template id="buyRowTemplate">
         <div class="buy-row" data-mode="buy">
-            <div class="buy-row-mode">
-                <button class="buy-row-mode-btn active" data-row-mode="buy" type="button">Купівля</button>
-                <button class="buy-row-mode-btn" data-row-mode="sell" type="button">Продаж</button>
+            <div class="buy-row-field buy-row-mode-field">
+                <label class="buy-row-label">Тип</label>
+                <div class="buy-row-mode">
+                    <button class="buy-row-mode-btn active" data-row-mode="buy" type="button"><span class="buy-row-mode-icon">↓</span>Купівля</button>
+                    <button class="buy-row-mode-btn" data-row-mode="sell" type="button"><span class="buy-row-mode-icon">↑</span>Продаж</button>
+                </div>
             </div>
             <div class="buy-row-field buy-row-name-field">
-                <input class="buy-row-name" placeholder="Назва кейса" type="text"/>
+                <label class="buy-row-label">Назва кейса</label>
+                <input class="buy-row-name" type="text"/>
                 <select class="buy-row-case-select" hidden="">
                     <option value="">Оберіть кейс</option>
                 </select>
                 <div class="buy-row-suggest" hidden=""></div>
             </div>
-            <div class="buy-row-field">
-                <input class="buy-row-qty" inputmode="numeric" placeholder="К-сть"/>
+            <div class="buy-row-field buy-row-qty-field">
+                <label class="buy-row-label">К-сть, шт</label>
+                <input class="buy-row-qty" inputmode="numeric"/>
             </div>
             <div class="buy-row-field">
+                <label class="buy-row-label">Дата</label>
                 <input class="buy-row-date" type="date"/>
             </div>
-            <div class="buy-row-field">
-                <input class="buy-row-buy" inputmode="decimal" placeholder="Сума за все"/>
+            <div class="buy-row-field buy-row-sum-field">
+                <label class="buy-row-label buy-row-sum-label">Сума за все, ₴</label>
+                <input class="buy-row-buy" inputmode="decimal"/>
             </div>
-            <button class="buy-row-remove" title="Видалити рядок" type="button">×</button>
+            <div class="buy-row-field buy-row-remove-field">
+                <label class="buy-row-label buy-row-label-spacer" aria-hidden="true">&nbsp;</label>
+                <button class="buy-row-remove" title="Видалити рядок" type="button">×</button>
+            </div>
         </div>
     </template>
 
